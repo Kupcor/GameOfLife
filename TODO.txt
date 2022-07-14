@@ -1,0 +1,2 @@
+1. Dead cell witch has three neigbours will be alive in next iteration.
+2. Alive cell with 2 or 3 neigbours stay alive. When amount of neighbours is diffrent -> cell become dead. 
