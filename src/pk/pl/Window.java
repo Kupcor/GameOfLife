@@ -12,7 +12,7 @@ public class Window extends JFrame {
         this.width = width;
         this.height = height;
         this.setLayout(this.mainGridLayout);
-        this.setSize(this.width, this.height);
+        this.setSize(this.width*100, this.height*100);
         this.setVisible(true);
     }
 }

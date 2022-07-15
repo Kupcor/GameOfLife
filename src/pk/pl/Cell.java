@@ -6,9 +6,13 @@ import java.awt.*;
 
 public class Cell extends JLabel {
     private boolean isAlive;
+    private int xPosition;
+    private int yPosition;
 
-    public Cell (boolean isAlive) {
+    public Cell (boolean isAlive, int xPosition, int yPosition) {
         this.isAlive = isAlive;
+        this.xPosition = xPosition;
+        this.yPosition = yPosition;
         this.setOpaque(true);
 
         if (isAlive) {
@@ -30,5 +34,13 @@ public class Cell extends JLabel {
 
     public boolean isAlive() {
         return isAlive;
+    }
+
+    public int getxPosition() {
+        return xPosition;
+    }
+
+    public int getyPosition() {
+        return yPosition;
     }
 }
