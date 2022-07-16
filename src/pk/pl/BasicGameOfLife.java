@@ -1,5 +1,10 @@
 package pk.pl;
 
+/*
+Implementation of Game Of Life by John Horton Conway
+Program author: Piotr Kupczyk
+*/
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -10,37 +15,46 @@ public class BasicGameOfLife extends Window implements MouseListener {
     private final ArrayList<ArrayList<Cell>> cellsContainer = new ArrayList<>();
     private final boolean[][] nextGenerationStatuses;
     private int numberOfGeneration = 0;
+    private boolean infiniteNextGenLoop = false;
+    private boolean infiniteGrid = true;
 
     private final JButton nextGenerationButton = new JButton("Next generation");
     private final JButton startStopNextGenLoopButton = new JButton("Next generation loop");
+    private final JButton clearGridButton = new JButton("Clear");
+    private final JButton infiniteGridButton = new JButton("Infinite grid: ON");
 
-    private final JTextField nextGenerationNumberField = new JTextField();
 
     private final JPanel gamePanel = new JPanel();
-    private final JPanel menuPanel = new JPanel();
 
-    private final JLabel generationNumberLabel = new JLabel("Number of generations: " + numberOfGeneration);
+    private final JLabel generationNumberLabel = new JLabel("Number of generations: " + this.numberOfGeneration, SwingConstants.CENTER);
 
-    public BasicGameOfLife() {
+
+    public BasicGameOfLife()  {
         super(50, 50);
+        this.setTitle("Basic Game of Life");
+        
         this.nextGenerationStatuses = new boolean[this.gridWidth][this.gridHeight];
 
-        this.gamePanel.setBackground(Color.BLUE);
-        this.gamePanel.setLayout(new GridLayout(this.gridWidth, this.gridHeight));
+        this.gamePanel.setLayout(new GridLayout(this.gridWidth, this.gridHeight, 0, 0));
 
-        this.menuPanel.setLayout(new GridLayout(0,4));
+        JPanel menuPanel = new JPanel();
+        menuPanel.setLayout(new GridLayout(2,4,0,0));
 
         this.nextGenerationButton.addMouseListener(this);
         this.startStopNextGenLoopButton.addMouseListener(this);
+        this.clearGridButton.addMouseListener(this);
+        this.infiniteGridButton.addMouseListener(this);
 
-        this.menuPanel.add(nextGenerationButton);
-        this.menuPanel.add(startStopNextGenLoopButton);
-        this.menuPanel.add(nextGenerationNumberField);
-        this.menuPanel.add(generationNumberLabel);
+        menuPanel.add(this.nextGenerationButton);
+        menuPanel.add(this.startStopNextGenLoopButton);
+        menuPanel.add(this.clearGridButton);
+        menuPanel.add(this.infiniteGridButton);
+        menuPanel.add(this.generationNumberLabel);
         this.createGrid();
 
-        this.add(gamePanel);
-        this.add(menuPanel);
+        this.add(gamePanel, BorderLayout.CENTER);
+        this.add(menuPanel, BorderLayout.PAGE_END);
+        this.revalidate();
         this.gamePanel.setVisible(true);
     }
 
@@ -56,7 +70,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
                 tempCellsContainer.add(cell);
                 this.gamePanel.add(cell);
 
-                nextGenerationStatuses[verticalPosition][horizontalPosition] = false;
+                this.nextGenerationStatuses[verticalPosition][horizontalPosition] = false;
             }
 
             this.cellsContainer.add(tempCellsContainer);
@@ -66,11 +80,17 @@ public class BasicGameOfLife extends Window implements MouseListener {
     private void checkGameOfLifeRules() {
         for (int verticalPosition = 0; verticalPosition < this.gridHeight; verticalPosition++) {
             for (int horizontalPosition = 0; horizontalPosition < this.gridWidth; horizontalPosition++) {
-                this.checkCellNeighbourhood(verticalPosition, horizontalPosition);
+                if (this.infiniteGrid) {
+                    this.checkCellInfiniteNeighbourhood(verticalPosition, horizontalPosition);
+                }
+                else {
+                    this.checkCellNeighbourhood(verticalPosition, horizontalPosition);
+                }
             }
         }
     }
 
+    //  Finite grid with dimensions gridWidht x gridHeight
     private void checkCellNeighbourhood(int verticalPosition, int horizontalPosition) {
         int aliveNeighbours = 0;
         for (int iterator = verticalPosition - 1; iterator < verticalPosition+2; iterator++) {
@@ -80,6 +100,26 @@ public class BasicGameOfLife extends Window implements MouseListener {
                             && !(iterator == verticalPosition && subIterator == horizontalPosition)) {
                         aliveNeighbours += 1;
                     }
+                }
+            }
+        }
+        this.setNextGenerationStatuses(aliveNeighbours, verticalPosition, horizontalPosition);
+    }
+
+    //  Infinite grid
+    private void checkCellInfiniteNeighbourhood(int verticalPosition, int horizontalPosition) {
+        int aliveNeighbours = 0;
+        for (int iterator = verticalPosition - 1; iterator < verticalPosition+2; iterator++) {
+            for (int subIterator = horizontalPosition - 1; subIterator < horizontalPosition+2; subIterator++) {
+                int yIndex = iterator;
+                int xIndex = subIterator;
+                if (iterator < 0) {yIndex = this.gridHeight - 1;}
+                if (iterator >= this.gridHeight) {yIndex = 0;}
+                if (subIterator < 0) {xIndex = gridWidth - 1;}
+                if (subIterator >= this.gridWidth) {xIndex = 0;}
+                if (this.cellsContainer.get(yIndex).get(xIndex).isAlive()
+                        && !(iterator == verticalPosition && subIterator == horizontalPosition)) {
+                    aliveNeighbours += 1;
                 }
             }
         }
@@ -110,31 +150,66 @@ public class BasicGameOfLife extends Window implements MouseListener {
 
     private void updateNextGenerationNumber() {
         this.numberOfGeneration += 1;
-        generationNumberLabel.setText("Number of generations: " + numberOfGeneration);
+        this.generationNumberLabel.setText("Number of generations: " + this.numberOfGeneration);
     }
 
-    private void nextGeneration(int n) {
-        for (int i = 0; i < n; i++) {
-            checkGameOfLifeRules();
-            setNextGeneration();
-            updateNextGenerationNumber();
+    private void nextGeneration() {
+        checkGameOfLifeRules();
+        setNextGeneration();
+        updateNextGenerationNumber();
+        this.revalidate();
+    }
+
+    private void nextGenerationLoop() {
+        Timer timer = new Timer(100, e -> {
+            if (!infiniteNextGenLoop) {
+                ((Timer)e.getSource()).stop();
+            }
+            else {
+                nextGeneration();
+            }
+        });
+        timer.start();
+    }
+
+    private void setInfiniteLoop() {
+        this.infiniteNextGenLoop = !this.infiniteNextGenLoop;
+    }
+
+    private void setInfiniteGrid() {
+        this.infiniteGrid = !this.infiniteGrid;
+        if (this.infiniteGrid) this.infiniteGridButton.setText("Infinite grid: ON");
+        else this.infiniteGridButton.setText("Infinite grid: OFF");
+    }
+
+
+    private void clearGrid() {
+        this.setInfiniteLoop();
+        for (int verticalPosition = 0; verticalPosition < this.gridHeight; verticalPosition++) {
+            for (int horizontalPosition = 0; horizontalPosition < this.gridWidth; horizontalPosition++) {
+                this.nextGenerationStatuses[verticalPosition][horizontalPosition] = false;
+            }
         }
+        this.setNextGeneration();
+        this.numberOfGeneration = 0;
+        this.generationNumberLabel.setText("Number of generations: " + numberOfGeneration);
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (e.getSource() == nextGenerationButton) {
-            nextGeneration(1);
+        if (e.getSource() == this.nextGenerationButton) {
+            nextGeneration();
         }
-
-        if (e.getSource() == startStopNextGenLoopButton){
-            try {
-                nextGeneration(Integer.parseInt(nextGenerationNumberField.getText()));
-            } catch (NumberFormatException ex) {
-                System.out.println("Wprowadzono błędy format!");
-            }
+        if (e.getSource() == this.startStopNextGenLoopButton){
+            this.setInfiniteLoop();
+            this.nextGenerationLoop();
         }
-
+        if (e.getSource() == this.clearGridButton) {
+            this.clearGrid();
+        }
+        if (e.getSource() == this.infiniteGridButton) {
+            this.setInfiniteGrid();
+        }
         if (e.getSource() instanceof Cell) {
             if (((Cell) e.getSource()).isAlive()) {
                 ((Cell) e.getSource()).kill();
