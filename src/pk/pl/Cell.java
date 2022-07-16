@@ -1,25 +1,18 @@
 package pk.pl;
 
-
 import javax.swing.*;
 import java.awt.*;
 
 public class Cell extends JLabel {
     private boolean isAlive;
-    private int xPosition;
-    private int yPosition;
+    private final int verticalPosition;
+    private final int horizontalPosition;
 
-    public Cell (boolean isAlive, int xPosition, int yPosition) {
-        this.isAlive = isAlive;
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
+    public Cell (int verticalPosition, int horizontalPosition) {
+        this.verticalPosition = verticalPosition;
+        this.horizontalPosition = horizontalPosition;
         this.setOpaque(true);
-
-        if (isAlive) {
-            this.setBackground(Color.WHITE);
-        } else {
-            this.setBackground(Color.BLACK);
-        }
+        this.kill();
     }
 
     public void revive() {
@@ -36,11 +29,11 @@ public class Cell extends JLabel {
         return isAlive;
     }
 
-    public int getxPosition() {
-        return xPosition;
+    public int getVerticalPosition() {
+        return verticalPosition;
     }
 
-    public int getyPosition() {
-        return yPosition;
+    public int getHorizontalPosition() {
+        return horizontalPosition;
     }
 }

@@ -4,15 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Window extends JFrame {
-    protected int width;
-    protected int height;
-    protected GridLayout mainGridLayout = new GridLayout(2,1);
+    protected int gridWidth;
+    protected int gridHeight;
+    protected GridLayout windowGridLayout = new GridLayout(2,1);
 
-    public Window(int width, int height) {
-        this.width = width;
-        this.height = height;
-        this.setLayout(this.mainGridLayout);
-        this.setSize(this.width*100, this.height*100);
+    public Window(int gridWidth, int gridHeight) {
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.setLayout(this.windowGridLayout);
+        this.setSize(this.gridWidth * 5, this.gridHeight * 5);
         this.setVisible(true);
     }
 }
