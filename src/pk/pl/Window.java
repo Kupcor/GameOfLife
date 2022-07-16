@@ -22,5 +22,6 @@ public class Window extends JFrame {
         this.setLayout(this.mainFrameLayout);
         this.setSize(this.gridWidth * 12, this.gridHeight * 12);
         this.setVisible(true);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 }

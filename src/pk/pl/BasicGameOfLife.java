@@ -7,6 +7,8 @@ Program author: Piotr Kupczyk
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -16,23 +18,21 @@ public class BasicGameOfLife extends Window implements MouseListener {
     private final boolean[][] nextGenerationStatuses;
     private int numberOfGeneration = 0;
     private boolean infiniteNextGenLoop = false;
-    private boolean infiniteGrid = true;
-
+    private boolean repeatedGrid = true;
+    private boolean generateStructure = false;
     private final JButton nextGenerationButton = new JButton("Next generation");
     private final JButton startStopNextGenLoopButton = new JButton("Next generation loop");
     private final JButton clearGridButton = new JButton("Clear");
-    private final JButton infiniteGridButton = new JButton("Infinite grid: ON");
-
-
+    private final JButton repeatedGridButton = new JButton("Repeated grid: ON");
     private final JPanel gamePanel = new JPanel();
-
     private final JLabel generationNumberLabel = new JLabel("Number of generations: " + this.numberOfGeneration, SwingConstants.CENTER);
-
+    private final String[] optionJComboBoxList = {"Select structure...", "Oscilator 1", "Oscilator 2", "Voyager"};
+    private final JComboBox generateStructureList = new JComboBox(this.optionJComboBoxList);
 
     public BasicGameOfLife()  {
         super(50, 50);
         this.setTitle("Basic Game of Life");
-        
+
         this.nextGenerationStatuses = new boolean[this.gridWidth][this.gridHeight];
 
         this.gamePanel.setLayout(new GridLayout(this.gridWidth, this.gridHeight, 0, 0));
@@ -43,14 +43,23 @@ public class BasicGameOfLife extends Window implements MouseListener {
         this.nextGenerationButton.addMouseListener(this);
         this.startStopNextGenLoopButton.addMouseListener(this);
         this.clearGridButton.addMouseListener(this);
-        this.infiniteGridButton.addMouseListener(this);
+        this.repeatedGridButton.addMouseListener(this);
 
         menuPanel.add(this.nextGenerationButton);
         menuPanel.add(this.startStopNextGenLoopButton);
         menuPanel.add(this.clearGridButton);
-        menuPanel.add(this.infiniteGridButton);
+        menuPanel.add(this.repeatedGridButton);
+        menuPanel.add(this.generateStructureList);
         menuPanel.add(this.generationNumberLabel);
         this.createGrid();
+
+        this.generateStructureList.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                generateStructure = true;
+                infiniteNextGenLoop = false;
+            }
+        });
 
         this.add(gamePanel, BorderLayout.CENTER);
         this.add(menuPanel, BorderLayout.PAGE_END);
@@ -80,7 +89,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
     private void checkGameOfLifeRules() {
         for (int verticalPosition = 0; verticalPosition < this.gridHeight; verticalPosition++) {
             for (int horizontalPosition = 0; horizontalPosition < this.gridWidth; horizontalPosition++) {
-                if (this.infiniteGrid) {
+                if (this.repeatedGrid) {
                     this.checkCellInfiniteNeighbourhood(verticalPosition, horizontalPosition);
                 }
                 else {
@@ -90,7 +99,6 @@ public class BasicGameOfLife extends Window implements MouseListener {
         }
     }
 
-    //  Finite grid with dimensions gridWidht x gridHeight
     private void checkCellNeighbourhood(int verticalPosition, int horizontalPosition) {
         int aliveNeighbours = 0;
         for (int iterator = verticalPosition - 1; iterator < verticalPosition+2; iterator++) {
@@ -106,7 +114,6 @@ public class BasicGameOfLife extends Window implements MouseListener {
         this.setNextGenerationStatuses(aliveNeighbours, verticalPosition, horizontalPosition);
     }
 
-    //  Infinite grid
     private void checkCellInfiniteNeighbourhood(int verticalPosition, int horizontalPosition) {
         int aliveNeighbours = 0;
         for (int iterator = verticalPosition - 1; iterator < verticalPosition+2; iterator++) {
@@ -161,7 +168,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
     }
 
     private void nextGenerationLoop() {
-        Timer timer = new Timer(100, e -> {
+        Timer timer = new Timer(150, e -> {
             if (!infiniteNextGenLoop) {
                 ((Timer)e.getSource()).stop();
             }
@@ -176,12 +183,15 @@ public class BasicGameOfLife extends Window implements MouseListener {
         this.infiniteNextGenLoop = !this.infiniteNextGenLoop;
     }
 
-    private void setInfiniteGrid() {
-        this.infiniteGrid = !this.infiniteGrid;
-        if (this.infiniteGrid) this.infiniteGridButton.setText("Infinite grid: ON");
-        else this.infiniteGridButton.setText("Infinite grid: OFF");
+    private void setRepeatedGrid() {
+        this.repeatedGrid = !this.repeatedGrid;
+        if (this.repeatedGrid) this.repeatedGridButton.setText("Repeated grid: ON");
+        else this.repeatedGridButton.setText("Repeated grid: OFF");
     }
 
+    private void setGenerateStructure() {
+        this.generateStructure = !this.generateStructure;
+    }
 
     private void clearGrid() {
         this.setInfiniteLoop();
@@ -193,6 +203,28 @@ public class BasicGameOfLife extends Window implements MouseListener {
         this.setNextGeneration();
         this.numberOfGeneration = 0;
         this.generationNumberLabel.setText("Number of generations: " + numberOfGeneration);
+    }
+
+    private void structureGeneration(String structureType, int verticalPosition, int horizontalPosition) {
+        if (this.repeatedGrid) {
+            if ("Oscilator 1".equals(structureType)) {
+                for (int iterator = verticalPosition - 1; iterator < verticalPosition + 2; iterator++) {
+                    int yPosition;
+                    if (iterator < 0) yPosition = this.gridHeight - 1;
+                    else if (iterator >= this.gridHeight) yPosition = 0;
+                    else yPosition = iterator;
+
+                    this.cellsContainer.get(yPosition).get(horizontalPosition).revive();
+                    this.nextGenerationStatuses[yPosition][horizontalPosition] = true;
+                }
+            }
+        } else {
+            if ("Oscilator 1".equals(structureType)) {
+                for (int iterator = verticalPosition - 1; iterator < verticalPosition + 2; iterator++) {
+
+                }
+            }
+        }
     }
 
     @Override
@@ -207,19 +239,27 @@ public class BasicGameOfLife extends Window implements MouseListener {
         if (e.getSource() == this.clearGridButton) {
             this.clearGrid();
         }
-        if (e.getSource() == this.infiniteGridButton) {
-            this.setInfiniteGrid();
+        if (e.getSource() == this.repeatedGridButton) {
+            this.setRepeatedGrid();
         }
         if (e.getSource() instanceof Cell) {
-            if (((Cell) e.getSource()).isAlive()) {
-                ((Cell) e.getSource()).kill();
-                this.nextGenerationStatuses[((Cell) e.getSource()).getVerticalPosition()][((Cell) e.getSource()).getHorizontalPosition()] = false;
+            if (this.generateStructure) {
+                if (this.infiniteNextGenLoop) this.setInfiniteLoop();
+                this.structureGeneration(String.valueOf(this.generateStructureList.getSelectedItem()), ((Cell) e.getSource()).getVerticalPosition()
+                , ((Cell) e.getSource()).getHorizontalPosition());
+                this.generateStructureList.setSelectedIndex(0);
+                this.setGenerateStructure();
             }
             else {
-                ((Cell) e.getSource()).revive();
-                this.nextGenerationStatuses[((Cell) e.getSource()).getVerticalPosition()][((Cell) e.getSource()).getHorizontalPosition()] = true;
+                if (((Cell) e.getSource()).isAlive()) {
+                    ((Cell) e.getSource()).kill();
+                    this.nextGenerationStatuses[((Cell) e.getSource()).getVerticalPosition()][((Cell) e.getSource()).getHorizontalPosition()] = false;
+                } else {
+                    ((Cell) e.getSource()).revive();
+                    this.nextGenerationStatuses[((Cell) e.getSource()).getVerticalPosition()][((Cell) e.getSource()).getHorizontalPosition()] = true;
+                }
+                if (this.infiniteNextGenLoop) this.setInfiniteLoop();
             }
-
         }
     }
 
