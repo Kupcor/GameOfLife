@@ -5,12 +5,15 @@ Implementation of Game Of Life by John Horton Conway
 Program author: Piotr Kupczyk
 */
 
+import pk.structures.DataBase;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class BasicGameOfLife extends Window implements MouseListener {
@@ -25,8 +28,10 @@ public class BasicGameOfLife extends Window implements MouseListener {
     private final JButton clearGridButton = new JButton("Clear");
     private final JButton repeatedGridButton = new JButton("Repeated grid: ON");
     private final JPanel gamePanel = new JPanel();
-    private final JLabel generationNumberLabel = new JLabel("Number of generations: " + this.numberOfGeneration, SwingConstants.CENTER);
-    private final String[] optionJComboBoxList = {"Select structure...", "Oscilator 1", "Oscilator 2", "Voyager"};
+    private final JLabel generationNumberLabel = new JLabel("Number of generations: " +
+            this.numberOfGeneration, SwingConstants.CENTER);
+    private final String[] optionJComboBoxList = {"Select structure...", "Blinker", "Frog",
+            "Crocodile", "Glider", "Dakota"};
     private final JComboBox generateStructureList = new JComboBox(this.optionJComboBoxList);
 
     public BasicGameOfLife()  {
@@ -205,26 +210,54 @@ public class BasicGameOfLife extends Window implements MouseListener {
         this.generationNumberLabel.setText("Number of generations: " + numberOfGeneration);
     }
 
-    private void structureGeneration(String structureType, int verticalPosition, int horizontalPosition) {
+    //  TODO
+    private void structureGeneration(String structureType, int verticalPosition, int horizontalPosition) throws FileNotFoundException {
         if (this.repeatedGrid) {
-            if ("Oscilator 1".equals(structureType)) {
-                for (int iterator = verticalPosition - 1; iterator < verticalPosition + 2; iterator++) {
-                    int yPosition;
-                    if (iterator < 0) yPosition = this.gridHeight - 1;
-                    else if (iterator >= this.gridHeight) yPosition = 0;
-                    else yPosition = iterator;
-
-                    this.cellsContainer.get(yPosition).get(horizontalPosition).revive();
-                    this.nextGenerationStatuses[yPosition][horizontalPosition] = true;
+            switch (structureType) {
+                case "Blinker": {
+                    this.generateStructure("src\\pk\\structures\\blinker.txt",verticalPosition, horizontalPosition);
+                    break;
+                }
+                case "Frog": {
+                    this.generateStructure("src\\pk\\structures\\frog.txt",verticalPosition, horizontalPosition);
+                    break;
+                }
+                case "Crocodile": {
+                    this.generateStructure("src\\pk\\structures\\crocodile.txt",verticalPosition, horizontalPosition);
+                    break;
+                }
+                case "Glider": {
+                    this.generateStructure("src\\pk\\structures\\glider.txt",verticalPosition, horizontalPosition);
+                    break;
+                }
+                case "Dakota": {
+                    this.generateStructure("src\\pk\\structures\\dakota.txt",verticalPosition, horizontalPosition);
+                    break;
                 }
             }
         } else {
-            if ("Oscilator 1".equals(structureType)) {
-                for (int iterator = verticalPosition - 1; iterator < verticalPosition + 2; iterator++) {
 
-                }
-            }
         }
+    }
+
+    //  TODO na infinite planszy
+    private void generateStructure(String filePath, int verticalPosition, int horizontalPosition) throws FileNotFoundException {
+        DataBase dataBase = new DataBase(filePath);
+        int yPosition = verticalPosition;
+        int xPosition = horizontalPosition;
+        for (int iterator = 0; iterator < dataBase.getVerticalLength(); iterator++) {
+            for (int subIterator = 0; subIterator < dataBase.getHorizontalLength(); subIterator++) {
+                if (dataBase.getCellsStatuses(iterator, subIterator)) {
+                    this.cellsContainer.get(yPosition).get(xPosition).revive();
+                    this.nextGenerationStatuses[yPosition][xPosition] = true;
+                }
+                xPosition++;
+            }
+            yPosition++;
+            xPosition = horizontalPosition;
+        }
+
+
     }
 
     @Override
@@ -245,18 +278,24 @@ public class BasicGameOfLife extends Window implements MouseListener {
         if (e.getSource() instanceof Cell) {
             if (this.generateStructure) {
                 if (this.infiniteNextGenLoop) this.setInfiniteLoop();
-                this.structureGeneration(String.valueOf(this.generateStructureList.getSelectedItem()), ((Cell) e.getSource()).getVerticalPosition()
-                , ((Cell) e.getSource()).getHorizontalPosition());
+                try {
+                    this.structureGeneration(String.valueOf(this.generateStructureList.getSelectedItem()),
+                            ((Cell) e.getSource()).getVerticalPosition(), ((Cell) e.getSource()).getHorizontalPosition());
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                }
                 this.generateStructureList.setSelectedIndex(0);
                 this.setGenerateStructure();
             }
             else {
                 if (((Cell) e.getSource()).isAlive()) {
                     ((Cell) e.getSource()).kill();
-                    this.nextGenerationStatuses[((Cell) e.getSource()).getVerticalPosition()][((Cell) e.getSource()).getHorizontalPosition()] = false;
+                    this.nextGenerationStatuses [((Cell) e.getSource()).getVerticalPosition()]
+                                                [((Cell) e.getSource()).getHorizontalPosition()] = false;
                 } else {
                     ((Cell) e.getSource()).revive();
-                    this.nextGenerationStatuses[((Cell) e.getSource()).getVerticalPosition()][((Cell) e.getSource()).getHorizontalPosition()] = true;
+                    this.nextGenerationStatuses [((Cell) e.getSource()).getVerticalPosition()]
+                                                [((Cell) e.getSource()).getHorizontalPosition()] = true;
                 }
                 if (this.infiniteNextGenLoop) this.setInfiniteLoop();
             }
@@ -264,9 +303,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
+    public void mousePressed(MouseEvent e) {}
 
     @Override
     public void mouseReleased(MouseEvent e) {
@@ -274,9 +311,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
     public void mouseExited(MouseEvent e) {
