@@ -35,7 +35,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
     private final JComboBox generateStructureList = new JComboBox(this.optionJComboBoxList);
 
     public BasicGameOfLife() {
-        super(50);
+        super(60);
         this.setTitle("Basic Game of Life");
 
         this.nextGenerationStatuses = new boolean[this.gridHeight][this.gridWidth];

@@ -1,0 +1,5 @@
+TODO
+For now GameOfLife works only "square" board/matrix (e.g 70x70, 50x50, 1200x1200) - to be more precise it works for every
+dimensions but visualization not work correctly. Very interesting is example of board 50x100. In this situation there
+are created two structures, two boards, which have cells every second row. This allows two "Game of life" activities to
+work simultaneously on every second field. Need to be fixed.
