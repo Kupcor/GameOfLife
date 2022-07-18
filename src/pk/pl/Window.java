@@ -9,7 +9,7 @@ public class Window extends JFrame {
     protected int gridHeight;
     protected BorderLayout mainFrameLayout = new BorderLayout(0,0);
 
-    public Window(int gridWidth, int gridHeight) {
+    public Window(int dimension) {
         try {
             //  FlatLaf module -> see formdev.com/flatlaf/
             UIManager.setLookAndFeel(new FlatDarculaLaf());
@@ -17,8 +17,8 @@ public class Window extends JFrame {
             JOptionPane.showMessageDialog(this,
                     "Failed to initialized flat laf theme.");
         }
-        this.gridWidth = gridWidth;
-        this.gridHeight = gridHeight;
+        this.gridWidth = dimension;
+        this.gridHeight = dimension;
         this.setLayout(this.mainFrameLayout);
         this.setSize(this.gridWidth * 12, this.gridHeight * 12);
         this.setVisible(true);

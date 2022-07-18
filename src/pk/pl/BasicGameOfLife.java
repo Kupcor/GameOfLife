@@ -31,14 +31,14 @@ public class BasicGameOfLife extends Window implements MouseListener {
     private final JLabel generationNumberLabel = new JLabel("Number of generations: " +
             this.numberOfGeneration, SwingConstants.CENTER);
     private final String[] optionJComboBoxList = {"Select structure...", "Blinker", "Frog",
-            "Crocodile", "Glider", "Dakota", "Simkin gun"};
+            "Crocodile", "Glider", "Dakota", "Simkin gun", "Gosper gun"};
     private final JComboBox generateStructureList = new JComboBox(this.optionJComboBoxList);
 
     public BasicGameOfLife() {
-        super(50, 50);
+        super(50);
         this.setTitle("Basic Game of Life");
 
-        this.nextGenerationStatuses = new boolean[this.gridWidth][this.gridHeight];
+        this.nextGenerationStatuses = new boolean[this.gridHeight][this.gridWidth];
 
         this.gamePanel.setLayout(new GridLayout(this.gridWidth, this.gridHeight, 0, 0));
 
@@ -85,6 +85,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
                 this.gamePanel.add(cell);
 
                 this.nextGenerationStatuses[verticalPosition][horizontalPosition] = false;
+
             }
 
             this.cellsContainer.add(tempCellsContainer);
@@ -178,7 +179,7 @@ public class BasicGameOfLife extends Window implements MouseListener {
     }
 
     private void nextGenerationLoop() {
-        Timer timer = new Timer(150, e -> {
+        Timer timer = new Timer(90, e -> {
             if (!infiniteNextGenLoop) {
                 ((Timer) e.getSource()).stop();
             } else {
@@ -241,9 +242,13 @@ public class BasicGameOfLife extends Window implements MouseListener {
                 this.generateStructure("src\\pk\\structures\\simkingun.txt", verticalPosition, horizontalPosition);
                 break;
             }
+            case "Gosper gun": {
+                this.generateStructure("src\\pk\\structures\\gospergun.txt", verticalPosition, horizontalPosition);
+                break;
+            }
         }
     }
-    
+
     private void generateStructure(String filePath, int verticalPosition, int horizontalPosition) throws FileNotFoundException {
         DataBase dataBase = new DataBase(filePath);
         int yPosition = verticalPosition;
