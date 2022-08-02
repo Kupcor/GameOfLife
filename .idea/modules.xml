@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GameOfLife.iml" filepath="$PROJECT_DIR$/GameOfLife.iml" />
-      <module fileurl="file://$PROJECT_DIR$/src/pk/pl/structures/structures.iml" filepath="$PROJECT_DIR$/src/pk/pl/structures/structures.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/main/java/pk/pl/structures/structures.iml" filepath="$PROJECT_DIR$/src/main/java/pk/pl/structures/structures.iml" />
     </modules>
   </component>
 </project>

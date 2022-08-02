@@ -219,31 +219,31 @@ public class BasicGameOfLife extends Window implements MouseListener {
         String filePath;
         switch (structureType) {
             case "Blinker": {
-                this.generateStructure("src\\pk\\structures\\blinker.txt", verticalPosition, horizontalPosition);
+                this.generateStructure("src\\main\\java\\pk\\structures\\blinker.txt", verticalPosition, horizontalPosition);
                 break;
             }
             case "Frog": {
-                this.generateStructure("src\\pk\\structures\\frog.txt", verticalPosition, horizontalPosition);
+                this.generateStructure("src\\main\\java\\pk\\structures\\frog.txt", verticalPosition, horizontalPosition);
                 break;
             }
             case "Crocodile": {
-                this.generateStructure("src\\pk\\structures\\crocodile.txt", verticalPosition, horizontalPosition);
+                this.generateStructure("src\\main\\java\\pk\\structures\\crocodile.txt", verticalPosition, horizontalPosition);
                 break;
             }
             case "Glider": {
-                this.generateStructure("src\\pk\\structures\\glider.txt", verticalPosition, horizontalPosition);
+                this.generateStructure("src\\main\\java\\pk\\structures\\glider.txt", verticalPosition, horizontalPosition);
                 break;
             }
             case "Dakota": {
-                this.generateStructure("src\\pk\\structures\\dakota.txt", verticalPosition, horizontalPosition);
+                this.generateStructure("src\\main\\java\\pk\\structures\\dakota.txt", verticalPosition, horizontalPosition);
                 break;
             }
             case "Simkin gun": {
-                this.generateStructure("src\\pk\\structures\\simkingun.txt", verticalPosition, horizontalPosition);
+                this.generateStructure("src\\main\\java\\pk\\structures\\simkingun.txt", verticalPosition, horizontalPosition);
                 break;
             }
             case "Gosper gun": {
-                this.generateStructure("src\\pk\\structures\\gospergun.txt", verticalPosition, horizontalPosition);
+                this.generateStructure("src\\main\\java\\pk\\structures\\gospergun.txt", verticalPosition, horizontalPosition);
                 break;
             }
         }
